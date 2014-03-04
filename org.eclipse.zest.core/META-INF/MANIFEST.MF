@@ -14,5 +14,4 @@ Export-Package: org.eclipse.zest.core.widgets,
  org.eclipse.zest.core.widgets.gestures,
  org.eclipse.zest.core.widgets.internal;x-internal:=true,
  org.eclipse.zest.core.widgets.zooming
-Import-Package: com.ibm.icu.text;version="[3.8.1,5.0.0)"
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
