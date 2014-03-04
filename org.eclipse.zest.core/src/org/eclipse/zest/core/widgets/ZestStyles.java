@@ -59,6 +59,17 @@ public final class ZestStyles {
 	 * Style constant indiciating that nodes should not be resized on layout.
 	 */
 	public static final int NODES_NO_LAYOUT_RESIZE = 1 << 4;
+
+	/**
+	 * Style indicates that node not to be filled
+	 */
+	public static final int NODES_EMPTY = 1 << 5;
+
+	/**
+	 * Style indicates that node is to be painted as an oval
+	 */
+	public static final int NODES_CIRCULAR_SHAPE = 1 << 6;
+
 	/**
 	 * Style indicating that connections should show their direction by default.
 	 */

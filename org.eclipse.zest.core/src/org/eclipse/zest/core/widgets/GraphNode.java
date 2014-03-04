@@ -130,7 +130,7 @@ public class GraphNode extends GraphItem {
 		this.foreColor = graphModel.getGraph().DARK_BLUE;
 		this.backColor = graphModel.getGraph().LIGHT_BLUE;
 		this.highlightColor = graphModel.getGraph().HIGHLIGHT_COLOR;
-		this.borderColor = ColorConstants.lightGray;
+		this.borderColor = ColorConstants.black;
 		this.borderHighlightColor = ColorConstants.blue;
 		this.borderWidth = 1;
 		this.currentLocation = new PrecisionPoint(0, 0);
@@ -671,6 +671,8 @@ public class GraphNode extends GraphItem {
 		if (checkStyle(ZestStyles.NODES_HIDE_TEXT)) {
 			label.setText("");
 		}
+		label.setShape(checkStyle(ZestStyles.NODES_CIRCULAR_SHAPE));
+		label.setFillShape(!checkStyle(ZestStyles.NODES_EMPTY));
 		updateFigureForModel(label);
 		label.addFigureListener(new FigureListener() {
 			private Dimension previousSize = label.getBounds().getSize();

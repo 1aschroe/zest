@@ -26,7 +26,7 @@ import org.eclipse.zest.core.widgets.IStyleableFigure;
 
 /**
  * Overrides the Draw2D Label Figure class to ensure that the text is never
- * truncated. Also draws a rounded rectangle border.
+ * truncated.
  * 
  * @author Chris Callendar
  */
@@ -35,6 +35,8 @@ public class GraphLabel extends CachedLabel implements IStyleableFigure {
 	private Color borderColor;
 	private int borderWidth;
 	private int arcWidth;
+	private boolean round = false;
+	private boolean fillShape = true;
 
 	private boolean painting = false;
 
@@ -171,37 +173,13 @@ public class GraphLabel extends CachedLabel implements IStyleableFigure {
 		if (graphics instanceof ScaledGraphics) {
 			scale = ((ScaledGraphics) graphics).getAbsoluteScale();
 		}
-		// Top part inside the border (as fillGradient does not allow to fill a
-		// rectangle with round corners).
-		Rectangle rect = getBounds().getCopy();
-		rect.height /= 2;
-		graphics.setForegroundColor(getBackgroundColor());
-		graphics.setBackgroundColor(getBackgroundColor());
-		graphics.fillRoundRectangle(rect, arcWidth * safeBorderWidth, arcWidth
-				* 2 * safeBorderWidth);
-
-		// Bottom part inside the border.
-		rect.y = rect.y + rect.height;
-		rect.height += 1; // Not sure why it is needed, but it is needed ;-)
-		graphics.setForegroundColor(lightenColor);
-		graphics.setBackgroundColor(lightenColor);
-		graphics.fillRoundRectangle(rect, arcWidth * safeBorderWidth, arcWidth
-				* 2 * safeBorderWidth);
-
-		// Now fill the middle part of top and bottom part with a gradient.
-		rect = bounds.getCopy();
-		rect.height -= 2;
-		rect.y += (safeBorderWidth) / 2;
-		rect.y += (arcWidth / 2);
-		rect.height -= arcWidth / 2;
-		rect.height -= safeBorderWidth;
-		graphics.setBackgroundColor(lightenColor);
-		graphics.setForegroundColor(getBackgroundColor());
-		graphics.fillGradient(rect, true);
+		if (fillShape) {
+			fillShape(graphics, lightenColor, safeBorderWidth);
+		}
 
 		// Paint the border
 		if (borderWidth > 0) {
-			rect = getBounds().getCopy();
+			Rectangle rect = getBounds().getCopy();
 			rect.x += safeBorderWidth / 2;
 			rect.y += safeBorderWidth / 2;
 			rect.width -= safeBorderWidth;
@@ -209,7 +187,11 @@ public class GraphLabel extends CachedLabel implements IStyleableFigure {
 			graphics.setForegroundColor(borderColor);
 			graphics.setBackgroundColor(borderColor);
 			graphics.setLineWidth((int) (safeBorderWidth * scale));
-			graphics.drawRoundRectangle(rect, arcWidth, arcWidth);
+			if (round) {
+				graphics.drawOval(rect);
+			} else {
+				graphics.drawRoundRectangle(rect, arcWidth, arcWidth);
+			}
 		}
 
 		super.paint(graphics);
@@ -217,6 +199,43 @@ public class GraphLabel extends CachedLabel implements IStyleableFigure {
 		graphics.popState();
 
 		lightenColor.dispose();
+	}
+
+	private void fillShape(Graphics graphics, Color lightenColor,
+			int safeBorderWidth) {
+		Rectangle rect = getBounds().getCopy();
+
+		// First: Bottom part inside the border.
+		graphics.setForegroundColor(getBackgroundColor());
+		graphics.setBackgroundColor(getBackgroundColor());
+		if (round) {
+			// fillGradient does not allow ovals, so
+			graphics.fillOval(rect);
+		} else {
+			rect.height /= 2;
+			graphics.fillRoundRectangle(rect, arcWidth * safeBorderWidth,
+					arcWidth * 2 * safeBorderWidth);
+
+			// Top part inside the border (as fillGradient does not allow to
+			// fill a rectangle with round corners).
+			graphics.setForegroundColor(lightenColor);
+			graphics.setBackgroundColor(lightenColor);
+			rect.y = rect.y + rect.height;
+			rect.height += 1; // Not sure why it is needed, but it is needed ;-)
+			graphics.fillRoundRectangle(rect, arcWidth * safeBorderWidth,
+					arcWidth * 2 * safeBorderWidth);
+
+			// Now fill the middle part of top and bottom part with a gradient.
+			rect = bounds.getCopy();
+			rect.height -= 2;
+			rect.y += (safeBorderWidth) / 2;
+			rect.y += (arcWidth / 2);
+			rect.height -= arcWidth / 2;
+			rect.height -= safeBorderWidth;
+			graphics.setBackgroundColor(lightenColor);
+			graphics.setForegroundColor(getBackgroundColor());
+			graphics.fillGradient(rect, true);
+		}
 	}
 
 	protected Color getBackgroundTextColor() {
@@ -279,5 +298,13 @@ public class GraphLabel extends CachedLabel implements IStyleableFigure {
 
 	public void setArcWidth(int arcWidth) {
 		this.arcWidth = arcWidth;
+	}
+
+	public void setShape(boolean round) {
+		this.round = round;
+	}
+
+	public void setFillShape(boolean fill) {
+		this.fillShape = fill;
 	}
 }
